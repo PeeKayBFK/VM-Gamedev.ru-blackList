@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Black List by PeeKay
+// @name        Black List by PeeKay v0.2
 // @namespace   Violentmonkey Scripts
 // @match       *://gamedev.ru/*
 // @grant       none
@@ -8,57 +8,75 @@
 // @description 25.05.2023, 08:53:01
 // ==/UserScript==
 
+const ignoreList = ['Example1', 'Example2'];
 
-    const ignoreList = ['name1', 'name2', 'name3','name4','name5','add_more'];
-
-
+(function () {
     'use strict';
-
 
     const divElements = document.querySelectorAll('div.bound.head');
 
+divElements.forEach(divElement => {
 
-    divElements.forEach(divElement => {
+  const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
+  if (shouldRemove) {
+    const siblingsToRemove = []; // Array to collect next siblings
 
-        const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
-        if (shouldRemove) {
+    let nextSibling = divElement.nextElementSibling;
+    console.log(nextSibling);
+    if(divElements.length>1){
+      while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head'))) {
 
-            let nextSibling = divElement.nextElementSibling;
-            while (nextSibling && !nextSibling.classList.contains('bound') && !nextSibling.classList.contains('overflow')) {
-                nextSibling = nextSibling.nextElementSibling;
-            }
+      siblingsToRemove.push(nextSibling); // Add next sibling to the array
+      nextSibling = nextSibling.nextElementSibling;
+    }
+
+    if (nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) {
+      // Remove all collected siblings and the original divElement
+      siblingsToRemove.forEach(sibling => sibling.remove());
+      divElement.remove();
+    }}
+    else{
+
+      while (nextSibling && !nextSibling.querySelector('div.pages')) {
+  siblingsToRemove.push(nextSibling); // Add next sibling to the array
+  nextSibling = nextSibling.nextElementSibling;
+}
+
+if (nextSibling && nextSibling.querySelector('div.pages')) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();
+}
 
 
-            if (nextSibling && nextSibling.classList.contains('bound') && nextSibling.classList.contains('overflow')) {
-      
-                divElement.remove();
-                nextSibling.remove();
-            }
-        }
-    });
+    }
 
+  }
+});
 
-
-    'use strict';
-
-const divElements1 = document.querySelectorAll('div:not([class])');
-
+    const divElements1 = document.querySelectorAll('div:not([class])');
 
     divElements1.forEach(divElement => {
-
         const spanElements = divElement.querySelectorAll('span.q.small');
 
         spanElements.forEach(spanElement => {
-
             const value = spanElement.textContent.trim();
-
-
-            const shouldRemove = ignoreList.some(substring => value.substring(0,substring.length)===substring);
+            const shouldRemove = ignoreList.some(substring => value.substring(0, substring.length) === substring);
 
             if (shouldRemove) {
-                 console.log(parts);
-
                 divElement.remove();
             }
         });
     });
+
+  const bElements = document.querySelectorAll('b');
+
+bElements.forEach(bElement => {
+  ignoreList.forEach(substring => {
+    if (bElement.textContent.includes(substring)) {
+      const replacedContent = bElement.innerHTML.replace(new RegExp(substring, 'g'), '');
+      bElement.innerHTML = replacedContent;
+    }
+  });
+});
+})();
