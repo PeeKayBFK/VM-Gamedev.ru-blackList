@@ -1,0 +1,67 @@
+// ==UserScript==
+// @name        New script
+// @namespace   Violentmonkey Scripts
+// @match       *://gamedev.ru/*
+// @grant       none
+// @version     1.0
+// @author      -
+// @description 25.05.2023, 08:53:01
+// ==/UserScript==
+
+
+    const customSubstrings = ['name01', 'name02', 'name03'];
+
+(function() {
+    'use strict';
+
+    // Get all the <div> elements with class "bound head"
+    const divElements = document.querySelectorAll('div.bound.head');
+
+    // Iterate through each <div> element
+    divElements.forEach(divElement => {
+        // Check if the innerHTML contains the <ul> with Alex2233 substring
+        const shouldRemove = customSubstrings.some(substring => divElement.innerHTML.includes(substring));
+        if (shouldRemove) {
+            // Find the next sibling with class "bound overflow"
+            let nextSibling = divElement.nextElementSibling;
+            while (nextSibling && !nextSibling.classList.contains('bound') && !nextSibling.classList.contains('overflow')) {
+                nextSibling = nextSibling.nextElementSibling;
+            }
+
+            // Check if the next sibling is a <div> with class "bound overflow"
+            if (nextSibling && nextSibling.classList.contains('bound') && nextSibling.classList.contains('overflow')) {
+                // Remove both the current divElement and the next sibling
+                divElement.remove();
+                nextSibling.remove();
+            }
+        }
+    });
+})();
+
+(function() {
+    'use strict';
+
+    // Get all the <div> elements with no class
+    const divElements = document.querySelectorAll('div:not([class])');
+
+    // Iterate through each <div> element
+    divElements.forEach(divElement => {
+        // Find the <span> elements with class "q small" within the current <div>
+        const spanElements = divElement.querySelectorAll('span.q.small');
+
+        // Iterate through each <span> element
+        spanElements.forEach(spanElement => {
+            // Extract the value of the <span> element
+            const value = spanElement.textContent.trim();
+
+            // Split the value by "..."
+            const parts = value.split('...');
+            const shouldRemove = customSubstrings.some(substring => parts[0].includes(substring));
+            // Check if the first part contains "Alex2233"
+            if (shouldRemove) {
+                // Remove the current <div> element
+                divElement.remove();
+            }
+        });
+    });
+})();
