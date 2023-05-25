@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        Black List by PeeKay v0.2
+// @name        Black List by PeeKay
 // @namespace   Violentmonkey Scripts
 // @match       *://gamedev.ru/*
 // @grant       none
@@ -24,17 +24,16 @@ divElements.forEach(divElement => {
     let nextSibling = divElement.nextElementSibling;
     console.log(nextSibling);
     if(divElements.length>1){
-      while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head'))) {
+    while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) && !nextSibling.querySelector('div.pages')) {
+  siblingsToRemove.push(nextSibling); // Add next sibling to the array
+  nextSibling = nextSibling.nextElementSibling;
+}
 
-      siblingsToRemove.push(nextSibling); // Add next sibling to the array
-      nextSibling = nextSibling.nextElementSibling;
-    }
-
-    if (nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) {
-      // Remove all collected siblings and the original divElement
-      siblingsToRemove.forEach(sibling => sibling.remove());
-      divElement.remove();
-    }}
+if ((nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) || (nextSibling && nextSibling.querySelector('div.pages'))) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();
+}}
     else{
 
       while (nextSibling && !nextSibling.querySelector('div.pages')) {
