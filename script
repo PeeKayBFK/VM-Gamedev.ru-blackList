@@ -9,7 +9,6 @@
 // ==/UserScript==
 
 const ignoreList = ['Example1', 'Example2'];
-
 (function () {
     'use strict';
 
@@ -67,6 +66,29 @@ if (nextSibling && nextSibling.querySelector('div.pages')) {
             }
         });
     });
+
+  var divs = document.getElementsByTagName("div");
+
+// Iterate through each div
+for (var i = 0; i < divs.length; i++) {
+  var div = divs[i];
+
+  // Check if the div has inline style "padding: 5px"
+  if (div.style.padding === "5px") {
+    // Check if the div contains a <b> element
+    var boldElement = div.getElementsByTagName("b")[0];
+
+    if (boldElement){
+    const shouldRemove = ignoreList.some(substring => boldElement.textContent===substring);
+
+      if (shouldRemove){
+
+        div.remove();
+
+      }
+    
+    }
+  }}
 
   const bElements = document.querySelectorAll('b');
 
