@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Black List by PeeKay v0.3
+// @name        Black List by PeeKay v0.2
 // @namespace   Violentmonkey Scripts
 // @match       *://gamedev.ru/*
 // @grant       none
-// @version     0.3
+// @version     0.4
 // @author      -
 // @description 25.05.2023, 08:53:01
 // ==/UserScript==
@@ -11,12 +11,14 @@ const ignoreList = ['Alex2233', 'Bondersan'];
 
 const tagList = [
                  { nick: 'PeeKay', tag: 'Создатель скрипта' },
-                 { nick: 'wat', tag: 'Создатель сайта' },
+                 { nick: 'wat', tag: 'Создатель сайта' }
                 ];
 
 (function()
 {
     'use strict';
+    ChangeNewStyle();
+
     const divElements = document.querySelectorAll('div.bound.head');
 
     divElements.forEach(divElement =>
@@ -115,6 +117,13 @@ const tagList = [
         });
     });
 })();
+
+function ChangeNewStyle()
+{
+  var style = document.createElement("style");
+  style.textContent = ".row.u span.red.small {width: 0.7em;display: inline-flex;height: 0.7em;content-visibility: hidden;background-color: red;border-radius: 50%;vertical-align: middle;font-size: 1em; }";
+  document.head.appendChild(style);
+}
 
 function CheckTag(divElement, objectArray)
 {
