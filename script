@@ -1,9 +1,9 @@
   // ==UserScript==
-  // @name        Black List by PeeKay v0.3
+  // @name        Black List by PeeKay v0.4
   // @namespace   Violentmonkey Scripts
   // @match       *://gamedev.ru/*
   // @grant       none
-  // @version     0.3
+  // @version     0.4
   // @author      -
   // @description 25.05.2023, 08:53:01
   // ==/UserScript==
@@ -31,50 +31,43 @@
     ChangeNewStyle();
 
     const divElements = document.querySelectorAll('div.bound.head');
+divElements.forEach(divElement => {
 
-    divElements.forEach(divElement =>
-    {
-        const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
+  const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
+  if (shouldRemove) {
+    const siblingsToRemove = []; // Array to collect next siblings
 
-        if (shouldRemove)
-        {
-            const siblingsToRemove = []; // Array to collect next siblings
-            let nextSibling = divElement.nextElementSibling;
-            console.log(nextSibling);
+    let nextSibling = divElement.nextElementSibling;
+    console.log(nextSibling);
+    if(divElements.length>1){
+    while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) && !nextSibling.querySelector('div.pages')) {
+  siblingsToRemove.push(nextSibling); // Add next sibling to the array
+  nextSibling = nextSibling.nextElementSibling;
+}
 
-            if (divElements.length > 1)
-            {
-                while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')))
-                {
-                    siblingsToRemove.push(nextSibling); // Add next sibling to the array
-                    nextSibling = nextSibling.nextElementSibling;
-                }
+if ((nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) || (nextSibling && nextSibling.querySelector('div.pages'))) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();
+}}
+    else{
 
-                if (nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head'))
-                {
-                    // Remove all collected siblings and the original divElement
-                    siblingsToRemove.forEach(sibling => sibling.remove());
-                    divElement.remove();
-                }
-            }
-            else
-            {
-                while (nextSibling && !nextSibling.querySelector('div.pages'))
-                {
-                    siblingsToRemove.push(nextSibling); // Add next sibling to the array
-                    nextSibling = nextSibling.nextElementSibling;
-                }
+      while (nextSibling && !nextSibling.querySelector('div.pages')) {
+  siblingsToRemove.push(nextSibling); // Add next sibling to the array
+  nextSibling = nextSibling.nextElementSibling;
+}
 
-                if (nextSibling && nextSibling.querySelector('div.pages'))
-                {
-                    // Remove all collected siblings and the original divElement
-                    siblingsToRemove.forEach(sibling => sibling.remove());
-                    divElement.remove();
-                }
-            }
-        }
+if (nextSibling && nextSibling.querySelector('div.pages')) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();
+}
 
-        var tagCheckResult = CheckTag(divElement, tagList);
+
+    }
+
+  }
+ var tagCheckResult = CheckTag(divElement, tagList);
 
         if (tagCheckResult.result == true)
         {
@@ -95,6 +88,9 @@
             liElement.insertBefore(spanElement, aElement.nextSibling);
         }
     });
+
+
+
 
       const divElements1 = document.querySelectorAll('div:not([class])');
 
