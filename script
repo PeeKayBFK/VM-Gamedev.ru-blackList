@@ -7,11 +7,19 @@
 // @author      -
 // @description 25.05.2023, 08:53:01
 // ==/UserScript==
-const ignoreList = ['Alex2233', 'Bondersan'];
 
+
+
+const ignoreList = ['Example1', 'Example2'];
+const GOLD ="#cc9d04";
+const GREEN = "#245511";
+const BLUE = "#1181c2";
+const PINK ="#801f42";
+const ORANGE ="#db6809";
+const PURPLE = "#541482";
 const tagList = [
-                 { nick: 'PeeKay', tag: 'Создатель скрипта' },
-                 { nick: 'wat', tag: 'Создатель сайта' },
+                 { nick: 'PeeKay', tag: 'Создатель скрипта', color: GOLD },
+                 { nick: 'wat', tag: 'Создатель сайта', color: PURPLE }
                 ];
 
 (function()
@@ -21,43 +29,35 @@ const tagList = [
 
     divElements.forEach(divElement =>
     {
-        const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
+         const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
+  if (shouldRemove) {
+    const siblingsToRemove = []; // Array to collect next siblings
 
-        if (shouldRemove)
-        {
-            const siblingsToRemove = []; // Array to collect next siblings
-            let nextSibling = divElement.nextElementSibling;
-            console.log(nextSibling);
+    let nextSibling = divElement.nextElementSibling;
+    console.log(nextSibling);
+    if(divElements.length>1){
+    while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) && !nextSibling.querySelector('div.pages')) {
+  siblingsToRemove.push(nextSibling); // Add next sibling to the array
+  nextSibling = nextSibling.nextElementSibling;
+}
 
-            if (divElements.length > 1)
-            {
-                while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')))
-                {
-                    siblingsToRemove.push(nextSibling); // Add next sibling to the array
-                    nextSibling = nextSibling.nextElementSibling;
-                }
+if ((nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) || (nextSibling && nextSibling.querySelector('div.pages'))) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();
+}}
+    else{
 
-                if (nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head'))
-                {
-                    // Remove all collected siblings and the original divElement
-                    siblingsToRemove.forEach(sibling => sibling.remove());
-                    divElement.remove();
-                }
-            }
-            else
-            {
-                while (nextSibling && !nextSibling.querySelector('div.pages'))
-                {
-                    siblingsToRemove.push(nextSibling); // Add next sibling to the array
-                    nextSibling = nextSibling.nextElementSibling;
-                }
+      while (nextSibling && !nextSibling.querySelector('div.pages')) {
+  siblingsToRemove.push(nextSibling); // Add next sibling to the array
+  nextSibling = nextSibling.nextElementSibling;
+}
 
-                if (nextSibling && nextSibling.querySelector('div.pages'))
-                {
-                    // Remove all collected siblings and the original divElement
-                    siblingsToRemove.forEach(sibling => sibling.remove());
-                    divElement.remove();
-                }
+if (nextSibling && nextSibling.querySelector('div.pages')) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();
+}
             }
         }
 
@@ -70,9 +70,9 @@ const tagList = [
             spanElement.style.border = '1px solid #335970';
             spanElement.style.borderRadius = '0.3em';
             spanElement.style.padding = '0.1em 0.2em';
-            spanElement.style.background = '#24475c';
+            spanElement.style.background = tagCheckResult.color;
             spanElement.style.fontSize = '0.8em';
-            spanElement.style.color = '#b1b1b1';
+            spanElement.style.color = '#FFFFFF';
             spanElement.style.opacity = '0.7';
             spanElement.innerHTML = tagCheckResult.tag;
 
@@ -121,7 +121,7 @@ function CheckTag(divElement, objectArray)
     const ulElement = divElement.querySelector('ul');
     const liElement = ulElement.querySelector('li');
     const aElement = liElement.querySelector('a');
-    const result = {result: false, tag: ''};
+    const result = {result: false, tag: '',color: ''};
 
     for (let i = 0; i < objectArray.length; i++)
     {
@@ -131,6 +131,7 @@ function CheckTag(divElement, objectArray)
         {
             result.result = true;
             result.tag = user.tag;
+            result.color = user.color;
             return result;
         }
     }
