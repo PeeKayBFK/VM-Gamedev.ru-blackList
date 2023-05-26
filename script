@@ -1,9 +1,9 @@
   // ==UserScript==
-  // @name        Black List by PeeKay v0.4
+  // @name        Black List by PeeKay v0.45
   // @namespace   Violentmonkey Scripts
   // @match       *://gamedev.ru/*
   // @grant       none
-  // @version     0.4
+  // @version     0.45
   // @author      -
   // @description 25.05.2023, 08:53:01
   // ==/UserScript==
@@ -21,6 +21,7 @@
   const tagList = [
                    { nick: 'PeeKay', tag: 'Создатель скрипта', bgcolor: GOLD, color: WHITE },
                    { nick: 'wat', tag: 'Создатель сайта', bgcolor: PURPLE, color: WHITE }
+                   
                   ];
 
 
@@ -31,9 +32,26 @@
     ChangeNewStyle();
 
     const divElements = document.querySelectorAll('div.bound.head');
-divElements.forEach(divElement => {
 
-  const shouldRemove = ignoreList.some(substring => divElement.innerHTML.includes(substring));
+
+divElements.forEach(divElement => {
+   const innerTag = divElement.innerHTML;
+const tempElement = document.createElement('div');
+tempElement.innerHTML = innerTag;
+const anchorTag = tempElement.querySelector('li');
+if (anchorTag) {
+  const tempText = anchorTag.innerHTML.trim();
+  const innerText = anchorTag.textContent.trim(); // Extract inner text directly from the anchorTag
+
+
+    console.log("Testing div"+ignoreList.some((substring) => divElement.innerHTML.includes(substring)&&substring === innerText && substring.length === innerText.length));
+    console.log("innerText"+innerText);
+    console.log("innerText"+innerText.length);
+    // Check if the inner text matches any of the objects in the ignoreList array
+    const shouldRemove = ignoreList.some((substring) => divElement.innerHTML.includes(substring)&&substring === innerText && substring.length === innerText.length);
+
+    // Compare the length of ignoreList with the trimmed inner text length
+
   if (shouldRemove) {
     const siblingsToRemove = []; // Array to collect next siblings
 
@@ -63,7 +81,7 @@ if (nextSibling && nextSibling.querySelector('div.pages')) {
   divElement.remove();
 }
 
-
+    }
     }
 
   }
