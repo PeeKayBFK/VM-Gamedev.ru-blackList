@@ -1,9 +1,9 @@
   // ==UserScript==
-  // @name        Black List by PeeKay v0.45
+  // @name        Black List by PeeKay v0.5
   // @namespace   Violentmonkey Scripts
   // @match       *://gamedev.ru/*
   // @grant       none
-  // @version     0.45
+  // @version     0.5
   // @author      -
   // @description 25.05.2023, 08:53:01
   // ==/UserScript==
@@ -21,7 +21,6 @@
   const tagList = [
                    { nick: 'PeeKay', tag: 'Создатель скрипта', bgcolor: GOLD, color: WHITE },
                    { nick: 'wat', tag: 'Создатель сайта', bgcolor: PURPLE, color: WHITE }
-                   
                   ];
 
 
@@ -58,24 +57,24 @@ if (anchorTag) {
     let nextSibling = divElement.nextElementSibling;
     console.log(nextSibling);
     if(divElements.length>1){
-    while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) && !nextSibling.querySelector('div.pages')) {
+    while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) && !nextSibling.querySelector('div.pages') && !nextSibling.querySelector('div.path')) {
   siblingsToRemove.push(nextSibling); // Add next sibling to the array
   nextSibling = nextSibling.nextElementSibling;
 }
 
-if ((nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) || (nextSibling && nextSibling.querySelector('div.pages'))) {
+if ((nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) || (nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path'))) {
   // Remove all collected siblings and the original divElement
   siblingsToRemove.forEach(sibling => sibling.remove());
   divElement.remove();
 }}
     else{
 
-      while (nextSibling && !nextSibling.querySelector('div.pages')) {
+      while (nextSibling && !nextSibling.querySelector('div.pages')&& !nextSibling.querySelector('div.path')) {
   siblingsToRemove.push(nextSibling); // Add next sibling to the array
   nextSibling = nextSibling.nextElementSibling;
 }
 
-if (nextSibling && nextSibling.querySelector('div.pages')) {
+if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path'))) {
   // Remove all collected siblings and the original divElement
   siblingsToRemove.forEach(sibling => sibling.remove());
   divElement.remove();
