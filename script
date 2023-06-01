@@ -18,8 +18,7 @@
   const ORANGE ="#db6809";
   const PURPLE = "#541482";
   const WHITE = "#FFFFFF";
-  const tagList = [
-                   { nick: 'PeeKay', tag: 'Создатель скрипта', bgcolor: GOLD, color: WHITE },
+  const tagList = [                  
                    { nick: 'wat', tag: 'Создатель сайта', bgcolor: PURPLE, color: WHITE }
                   ];
 
