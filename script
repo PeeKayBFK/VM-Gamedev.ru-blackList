@@ -22,7 +22,6 @@
                   ];
 
 
-
 (function()
 {
     'use strict';
@@ -54,31 +53,42 @@ if (anchorTag) {
 
     let nextSibling = divElement.nextElementSibling;
     console.log(nextSibling);
-    if(divElements.length>1){
-    while (nextSibling && !(nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) && !nextSibling.querySelector('div.pages') && !nextSibling.querySelector('div.path')) {
-  siblingsToRemove.push(nextSibling); // Add next sibling to the array
-  nextSibling = nextSibling.nextElementSibling;
-}
+   if (divElements.length > 1) {
+  let nextSibling = divElement.nextElementSibling;
 
-if ((nextSibling && nextSibling.classList?.contains('bound') && nextSibling.classList?.contains('head')) || (nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path'))) {
+  while (nextSibling && !nextSibling.classList?.contains('bound')) {
+    siblingsToRemove.push(nextSibling); // Add next sibling to the array
+    nextSibling = nextSibling.nextElementSibling;
+  }
+
+  if (nextSibling && (nextSibling.classList?.contains('bound') || nextSibling.querySelector('div.pages') || nextSibling.querySelector('div.path'))) {
+    siblingsToRemove.push(nextSibling); // Add the nextSibling to the array
+  }
+
   // Remove all collected siblings and the original divElement
   siblingsToRemove.forEach(sibling => sibling.remove());
   divElement.remove();
-}}
+}
     else{
 
-      while (nextSibling && !nextSibling.querySelector('div.pages')&& !nextSibling.querySelector('div.path')) {
+      while (nextSibling && !nextSibling.querySelector('div.pages') && !nextSibling.querySelector('div.path') ) {
   siblingsToRemove.push(nextSibling); // Add next sibling to the array
   nextSibling = nextSibling.nextElementSibling;
 }
 
-if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path'))) {
+if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path') )) {
   // Remove all collected siblings and the original divElement
   siblingsToRemove.forEach(sibling => sibling.remove());
   divElement.remove();
 }
 
     }
+
+    if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path') )) {
+  // Remove all collected siblings and the original divElement
+  siblingsToRemove.forEach(sibling => sibling.remove());
+  divElement.remove();}
+
     }
 
   }
@@ -107,24 +117,28 @@ if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && ne
 
 
 
-      const divElements1 = document.querySelectorAll('div:not([class])');
+     const divElements1 = document.querySelectorAll('div:not([class])');
 
-      divElements1.forEach(divElement =>
-      {
-          const spanElements = divElement.querySelectorAll('span.q.small');
+divElements1.forEach(divElement => {
+  const spanElements = divElement.querySelectorAll('span.q.small');
 
-          spanElements.forEach(spanElement =>
-          {
-              const value = spanElement.textContent.trim();
-              const shouldRemove = ignoreList.some(substring => value.substring(0, substring.length) === substring);
+  spanElements.forEach(spanElement => {
+    let value = spanElement.textContent.trim();
 
-              if (shouldRemove)
-              {
-                  divElement.remove();
-              }
-          });
-      });
+    ignoreList.forEach(substring => {
+      const searchString = substring + ' [';
+      if (value.includes(searchString)) {
+        value = value.replace(searchString, '??? [');
+      }
+    });
 
+    spanElement.textContent = value;
+
+    if (ignoreList.some(substring => value.startsWith(substring))) {
+      divElement.remove();
+    }
+  });
+});
       const bElements = document.querySelectorAll('b');
 
       bElements.forEach(bElement =>
@@ -139,6 +153,8 @@ if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && ne
           });
       });
   })();
+
+
 
   function ChangeNewStyle()
   {
