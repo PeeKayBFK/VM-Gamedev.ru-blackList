@@ -1,11 +1,10 @@
   // ==UserScript==
-  // @name        Black List by PeeKay v0.5
+  // @name        Black List by Community v1.0
   // @namespace   Violentmonkey Scripts
   // @match       *://gamedev.ru/*
   // @grant       none
-  // @version     0.5
+  // @version     1.0
   // @author      -
-  // @description 25.05.2023, 08:53:01
   // ==/UserScript==
 
 
