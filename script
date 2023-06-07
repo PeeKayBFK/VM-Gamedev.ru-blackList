@@ -22,165 +22,136 @@
                   ];
 
 
-(function()
-{
-    'use strict';
-    ChangeNewStyle();
+(function() {
+  'use strict';
 
-    const divElements = document.querySelectorAll('div.bound.head');
+  ChangeNewStyle();
 
+  const divElements = document.querySelectorAll('div.bound.head');
 
-divElements.forEach(divElement => {
-   const innerTag = divElement.innerHTML;
-const tempElement = document.createElement('div');
-tempElement.innerHTML = innerTag;
-const anchorTag = tempElement.querySelector('li');
-if (anchorTag) {
-  const tempText = anchorTag.innerHTML.trim();
-  const innerText = anchorTag.textContent.trim(); // Extract inner text directly from the anchorTag
+  divElements.forEach(divElement => {
+    const anchorTag = divElement.querySelector('li');
 
+    if (anchorTag) {
+      const innerText = anchorTag.textContent.trim();
+      const shouldRemove = ignoreList.some(substring => substring === innerText);
 
-    console.log("Testing div"+ignoreList.some((substring) => divElement.innerHTML.includes(substring)&&substring === innerText && substring.length === innerText.length));
-    console.log("innerText"+innerText);
-    console.log("innerText"+innerText.length);
-    // Check if the inner text matches any of the objects in the ignoreList array
-    const shouldRemove = ignoreList.some((substring) => divElement.innerHTML.includes(substring)&&substring === innerText && substring.length === innerText.length);
+      if (shouldRemove) {
+        const siblingsToRemove = [];
+        let nextSibling = divElement.nextElementSibling;
 
-    // Compare the length of ignoreList with the trimmed inner text length
+        if (divElements.length > 1) {
+          while (nextSibling && !nextSibling.classList?.contains('bound') && !nextSibling.classList?.contains('head')) {
+            siblingsToRemove.push(nextSibling);
+            nextSibling = nextSibling.nextElementSibling;
+          }
 
-  if (shouldRemove) {
-    const siblingsToRemove = []; // Array to collect next siblings
+          if (nextSibling && (nextSibling.classList?.contains('bound') || nextSibling.classList?.contains('head') || nextSibling.querySelector('div.pages') || nextSibling.querySelector('div.path'))) {
+            siblingsToRemove.push(nextSibling);
+          }
 
-    let nextSibling = divElement.nextElementSibling;
-    console.log(nextSibling);
-   if (divElements.length > 1) {
-  let nextSibling = divElement.nextElementSibling;
+          siblingsToRemove.forEach(sibling => sibling.remove());
+          divElement.remove();
+        } else {
+          while (nextSibling) {
+            if ((nextSibling instanceof Element && nextSibling.classList.contains('path'))
+              || (nextSibling instanceof Element && nextSibling.tagName === 'DIV' && nextSibling.classList.contains('head'))
+              || (nextSibling instanceof Element && nextSibling.tagName === 'DIV' && nextSibling.classList.contains('pages')) || (nextSibling instanceof Element && nextSibling.tagName === 'DIV' && nextSibling.classList.contains('path'))) {
+              siblingsToRemove.forEach(sibling => sibling.remove());
+              divElement.remove();
+            }
 
-  while (nextSibling && !nextSibling.classList?.contains('bound')) {
-    siblingsToRemove.push(nextSibling); // Add next sibling to the array
-    nextSibling = nextSibling.nextElementSibling;
-  }
+            siblingsToRemove.push(nextSibling);
+            nextSibling = nextSibling.nextSibling;
+          }
 
-  if (nextSibling && (nextSibling.classList?.contains('bound') || nextSibling.querySelector('div.pages') || nextSibling.querySelector('div.path'))) {
-    siblingsToRemove.push(nextSibling); // Add the nextSibling to the array
-  }
-
-  // Remove all collected siblings and the original divElement
-  siblingsToRemove.forEach(sibling => sibling.remove());
-  divElement.remove();
-}
-    else{
-
-      while (nextSibling && !nextSibling.querySelector('div.pages') && !nextSibling.querySelector('div.path') ) {
-  siblingsToRemove.push(nextSibling); // Add next sibling to the array
-  nextSibling = nextSibling.nextElementSibling;
-}
-
-if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path') )) {
-  // Remove all collected siblings and the original divElement
-  siblingsToRemove.forEach(sibling => sibling.remove());
-  divElement.remove();
-}
-
-    }
-
-    if ((nextSibling && nextSibling.querySelector('div.pages'))|| (nextSibling && nextSibling.querySelector('div.path') )) {
-  // Remove all collected siblings and the original divElement
-  siblingsToRemove.forEach(sibling => sibling.remove());
-  divElement.remove();}
-
-    }
-
-  }
- var tagCheckResult = CheckTag(divElement, tagList);
-
-        if (tagCheckResult.result == true)
-        {
-            const spanElement = document.createElement('span');
-            spanElement.style.marginLeft = '0.5em';
-            spanElement.style.border = '1px solid ' + tagCheckResult.user.color;
-            spanElement.style.borderRadius = '0.3em';
-            spanElement.style.padding = '0.1em 0.2em';
-            spanElement.style.background = tagCheckResult.user.bgcolor;
-            spanElement.style.fontSize = '0.8em';
-            spanElement.style.color = tagCheckResult.user.color;
-            spanElement.style.opacity = '0.7';
-            spanElement.innerHTML = tagCheckResult.user.tag;
-
-            const ulElement = divElement.querySelector('ul');
-            const liElement = ulElement.querySelector('li');
-            const aElement = liElement.querySelector('a');
-            liElement.insertBefore(spanElement, aElement.nextSibling);
+          console.log(siblingsToRemove.length)
+          console.log(nextSibling)
+          if ((nextSibling instanceof Element && nextSibling.tagName === 'DIV' && nextSibling.classList.contains('pages')) || (nextSibling instanceof Element && nextSibling.tagName === 'DIV' && nextSibling.classList.contains('path'))) {
+            siblingsToRemove.forEach(sibling => sibling.remove());
+            divElement.remove();
+          }
         }
-    });
-
-
-
-
-     const divElements1 = document.querySelectorAll('div:not([class])');
-
-divElements1.forEach(divElement => {
-  const spanElements = divElement.querySelectorAll('span.q.small');
-
-  spanElements.forEach(spanElement => {
-    let value = spanElement.textContent.trim();
-
-    ignoreList.forEach(substring => {
-      const searchString = substring + ' [';
-      if (value.includes(searchString)) {
-        value = value.replace(searchString, '??? [');
       }
-    });
 
-    spanElement.textContent = value;
+      var tagCheckResult = CheckTag(divElement, tagList);
 
-    if (ignoreList.some(substring => value.startsWith(substring))) {
-      divElement.remove();
+      if (tagCheckResult.result == true) {
+        const spanElement = document.createElement('span');
+        spanElement.style.marginLeft = '0.5em';
+        spanElement.style.border = '1px solid ' + tagCheckResult.user.color;
+        spanElement.style.borderRadius = '0.3em';
+        spanElement.style.padding = '0.1em 0.2em';
+        spanElement.style.background = tagCheckResult.user.bgcolor;
+        spanElement.style.fontSize = '0.8em';
+        spanElement.style.color = tagCheckResult.user.color;
+        spanElement.style.opacity = '0.7';
+        spanElement.innerHTML = tagCheckResult.user.tag;
+
+        const ulElement = divElement.querySelector('ul');
+        const liElement = ulElement.querySelector('li');
+        const aElement = liElement.querySelector('a');
+        liElement.insertBefore(spanElement, aElement.nextSibling);
+      }
     }
   });
-});
-      const bElements = document.querySelectorAll('b');
 
-      bElements.forEach(bElement =>
-      {
-          ignoreList.forEach(substring =>
-          {
-              if (bElement.textContent.includes(substring))
-              {
-                  const replacedContent = bElement.innerHTML.replace(new RegExp(substring, 'g'), '');
-                  bElement.innerHTML = replacedContent;
-              }
-          });
+  const bElements = document.querySelectorAll('b');
+
+  bElements.forEach(bElement => {
+    ignoreList.forEach(substring => {
+      if (bElement.textContent.includes(substring)) {
+        const replacedContent = bElement.innerHTML.replace(new RegExp(substring, 'g'), '');
+        bElement.innerHTML = replacedContent;
+      }
+    });
+  });
+
+  const divElements1 = document.querySelectorAll('div:not([class])');
+
+  divElements1.forEach(divElement => {
+    const spanElements = divElement.querySelectorAll('span.q.small');
+
+    spanElements.forEach(spanElement => {
+      let value = spanElement.textContent.trim();
+
+      if (ignoreList.some(substring => value.startsWith(substring))) {
+        divElement.remove();
+      }
+
+      ignoreList.forEach(substring => {
+        const searchString = substring + ' [';
+        if (value.includes(searchString)) {
+          value = value.replace(searchString, '??? [');
+        }
       });
-  })();
 
+      spanElement.textContent = value;
+    });
+  });
 
-
-  function ChangeNewStyle()
-  {
+  function ChangeNewStyle() {
     var style = document.createElement("style");
     style.textContent = ".row.u span.red.small {width: 0.7em;display: inline-flex;height: 0.7em;content-visibility: hidden;background-color: red;border-radius: 50%;vertical-align: middle;font-size: 1em; }";
     document.head.appendChild(style);
   }
 
-  function CheckTag(divElement, objectArray)
-  {
-      const ulElement = divElement.querySelector('ul');
-      const liElement = ulElement.querySelector('li');
-      const aElement = liElement.querySelector('a');
-      const result = {result: false, user: undefined};
+  function CheckTag(divElement, objectArray) {
+    const ulElement = divElement.querySelector('ul');
+    const liElement = ulElement.querySelector('li');
+    const aElement = liElement.querySelector('a');
+    const result = { result: false, user: undefined };
 
-      for (let i = 0; i < objectArray.length; i++)
-      {
-          const user = objectArray[i];
+    for (let i = 0; i < objectArray.length; i++) {
+      const user = objectArray[i];
 
-          if (aElement.innerHTML.includes(user.nick))
-          {
-              result.result = true;
-              result.user = user;
-              return result;
-          }
+      if (aElement.innerHTML.includes(user.nick)) {
+        result.result = true;
+        result.user = user;
+        return result;
       }
+    }
 
-      return result;
+    return result;
   }
+})();
