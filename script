@@ -1,31 +1,259 @@
   // ==UserScript==
-  // @name        Black List by Community v1.0
+  // @name        Black List v1.5
   // @namespace   Violentmonkey Scripts
   // @match       *://gamedev.ru/*
   // @grant       none
-  // @version     1.0
+  // @version     1.1
   // @author      -
+  // @description 25.05.2023, 08:53:01
   // ==/UserScript==
 
 
 
-  const ignoreList = ['Example1','Example2'];
-  const GOLD ="#cc9d04";
-  const GREEN = "#245511";
-  const BLUE = "#1181c2";
-  const PINK ="#801f42";
-  const ORANGE ="#db6809";
-  const PURPLE = "#541482";
-  const WHITE = "#FFFFFF";
-  const tagList = [                  
-                   { nick: 'wat', tag: 'Создатель сайта', bgcolor: PURPLE, color: WHITE }
-                  ];
 
 
 (function() {
   'use strict';
 
+const GOLD = "#cc9d04";
+const GREEN = "#245511";
+const BLUE = "#1181c2";
+const PINK = "#801f42";
+const ORANGE = "#db6809";
+const PURPLE = "#541482";
+const WHITE = "#FFFFFF";
+const BLACK = "#000000";
+const TEAL = "#000000";
+const tagList = [
+
+];
+
+  const PRESET_COLORS = [GOLD,TEAL, GREEN,BLUE,PINK,ORANGE,PURPLE,WHITE,BLACK];
   ChangeNewStyle();
+  addBlockListButton();
+  var ignoreList = [];
+
+
+
+// Function to populate the ignoreList array from ViolentMonkey's local storage
+function populateIgnoreListFromLocalStorage() {
+  const blockListStr = localStorage.getItem('blockList');
+  if (blockListStr) {
+    const blockList = JSON.parse(blockListStr);
+    ignoreList.push(...blockList);
+    console.log('Populated ignoreList from local storage:', ignoreList);
+  }
+}
+
+  function removeAllOccurrences(arr, element) {
+  return arr.filter((item) => item !== element);
+}
+
+// Function to add a new username to the ignoreList array and store it in local storage
+function addToIgnoreListAndStore(username) {
+  // Add the new username to the ignoreList
+  ignoreList.push(username);
+
+  // Convert the updated ignoreList array to a string
+  const ignoreListStr = JSON.stringify(ignoreList);
+  localStorage.setItem('blockList', []);
+  // Store the updated ignoreList in local storage
+  localStorage.setItem('blockList', ignoreListStr);
+  console.log('Updated ignoreList:', ignoreList);
+}
+
+  function showIgnoreList(event) {
+  // Prevent the default click behavior
+  event.preventDefault();
+  event.stopPropagation();
+
+  // Get the ignore list from storage (assuming you have it stored)
+  // Replace this with your actual ignoreList
+
+  // Create the container div
+  const containerDiv = document.createElement('div');
+  containerDiv.style.position = 'absolute';
+  containerDiv.style.left = `${(event.pageX-50)}px`;
+  containerDiv.style.top = `${(event.pageY-360)}px`;
+  containerDiv.style.width = '250px';
+
+  containerDiv.style.backgroundColor = 'white';
+  containerDiv.style.border = '1px solid black';
+  containerDiv.style.zIndex = '9999';
+    containerDiv.style.borderRadius = '15px';
+containerDiv.style.overflowX = 'hidden';
+
+// Disable bottom scroller
+containerDiv.style.overflowY = 'hidden';
+  // Create the ignore list items
+  const addedItems = [];
+ignoreList.forEach((username) => {
+  if (addedItems.includes(username)) {
+    return; // Skip to the next iteration if username is already in addedItems
+  }
+  const itemDiv = document.createElement('div');
+  addedItems.push(username);
+    itemDiv.style.height = '35px';
+    itemDiv.style.lineHeight = '35px';
+    itemDiv.style.padding = '0 5px';
+    itemDiv.textContent = username;
+    itemDiv.dataset.nick=username;
+    itemDiv.style.color=BLUE;
+    itemDiv.style.fontSize='16px';
+    itemDiv.style.fontWeight='bold';
+
+    // Create the remove button
+
+    const removeButton = document.createElement('span');
+    removeButton.textContent = 'x';
+    removeButton.style.float = 'right';
+    removeButton.style.marginRight = '25px';
+    removeButton.style.cursor = 'pointer';
+    removeButton.addEventListener('click', (e) => {
+      // Handle the click event to remove the username from the ignore list
+      const index = ignoreList.indexOf(username);
+      if (index !== -1) {
+        console.log("started","yes");
+        const ignoreList2=removeAllOccurrences(ignoreList, username);
+        const ignoreListStr = JSON.stringify(ignoreList2);
+        localStorage.setItem('blockList', []);
+        // Store the updated ignoreList in local storage
+        localStorage.setItem('blockList', ignoreListStr);
+        // You can also update the ignore list in the storage here if needed
+        // e.g., GM.setValue('ignoreList', JSON.stringify(ignoreList));
+        ignoreList=ignoreList2;
+        itemDiv.remove();
+        containerDiv.style.height = `${35 * getMenuSize(ignoreList2)}px`;
+        console.log("ended","yes");
+      }
+    });
+
+    // Append the remove button to the item div
+    itemDiv.appendChild(removeButton);
+
+    // Append the item div to the container div
+    containerDiv.appendChild(itemDiv);
+  });
+
+
+
+    const menu = document.querySelector('.modal-content');
+    const originalDisplay = menu.style.display;
+  menu.style.display = 'none';
+      containerDiv.style.height = `${35 * addedItems.length}px`;
+  // Function to collapse the ignore list when the mouse goes outside
+  function collapseIgnoreList(e) {
+       containerDiv.removeEventListener('mouseleave', collapseIgnoreList);
+    containerDiv.remove();
+
+    menu.style.display = originalDisplay;
+  }
+
+
+
+  // Add the container div to the document body
+  document.body.appendChild(containerDiv);
+
+  // Listen for clicks on the document to collapse the ignore list
+  containerDiv.addEventListener('mouseleave', collapseIgnoreList);
+}
+
+function getMenuSize(ignoreList12) {
+  var already = [];
+
+  ignoreList12.forEach(function (username) {
+    if (!already.includes(username)) {
+      already.push(username);
+    }
+  });
+
+  return already.length;
+}
+// Example usage:
+populateIgnoreListFromLocalStorage();
+
+
+
+  function populateTagListFromLocalStorage() {
+  const storedTagListStr = localStorage.getItem('tagList');
+  if (storedTagListStr) {
+    const storedTagList = JSON.parse(storedTagListStr);
+    tagList.push(...storedTagList);
+    console.log('Populated tagList from local storage:', tagList);
+  }
+}
+
+// Function to add a new object to the tagList array and store it in local storage
+function addNewTagToListAndStore(nick, tag, bgcolor, color) {
+  const newTag = { nick, tag, bgcolor, color };
+  tagList.push(newTag);
+  const updatedTagListStr = JSON.stringify(tagList);
+  localStorage.setItem('tagList', []);
+  localStorage.setItem('tagList', updatedTagListStr);
+  console.log('Updated tagList:', tagList);
+}
+
+function addBlockListButton() {
+  const containerDiv = document.querySelector('.modal-content');
+
+  // Create the new button element
+  const newButton = document.createElement('a');
+  newButton.classList.add('profile');
+
+  //newButton.href = 'https://gamedev.ru/users/?id=80128&a=newbutton';
+  newButton.title = 'Список заблокированных пользователей';
+  newButton.textContent = 'Черный список';
+  newButton.style.color = BLUE;
+  newButton.addEventListener('click', showIgnoreList);
+  // Get the "Созаднные темы" link
+  const createdTopicsLink = containerDiv.querySelector('a[title="Темы форума, которые вы создали"]');
+
+  // Check if the "Созаднные темы" link exists before inserting the new button
+  if (createdTopicsLink) {
+    // Insert the new button after the "Созаднные темы" link
+    containerDiv.insertBefore(newButton, createdTopicsLink.nextElementSibling);
+
+    // Optional: Add a horizontal line to separate the new button from the previous links
+    const hrElement = document.createElement('hr');
+    containerDiv.insertBefore(hrElement, newButton);
+  }
+}
+
+
+
+
+  function handleBadgeDoubleClick(event) {
+    const clickedBadge = event.target;
+    const nick = clickedBadge.dataset.nick; // Assuming 'nick' is stored as a data attribute
+    const tag = clickedBadge.dataset.tag;
+
+    // Find the index of the first element that matches 'nick' and 'tag'
+    const indexToRemove = tagList.findIndex((tagObj) => tagObj.nick === nick && tagObj.tag === tag);
+    console.log("pew","pew1");
+    if (indexToRemove !== -1) {
+      // Remove the element from tagList
+      tagList.splice(indexToRemove, 1);
+      console.log('Removed element:', nick, tag);
+
+      // Save the updated tagList to local storage or any other method for saving data
+      saveTagListToLocalFile();
+    }
+  }
+
+  function saveTagListToLocalFile() {
+  const tagListStr = JSON.stringify(tagList);
+  localStorage.setItem('tagList', tagListStr);
+  location.reload();
+  console.log('Updated tagList saved to local storage.');
+}
+
+  populateTagListFromLocalStorage();
+
+const divElements12 = document.querySelectorAll('div.bound.head li.bold a[href*="/users/"]');
+
+  divElements12.forEach(anchorTag => {
+    anchorTag.addEventListener('mouseenter', showOptions);
+  });
 
   const divElements = document.querySelectorAll('div.bound.head');
 
@@ -74,24 +302,30 @@
         }
       }
 
-      var tagCheckResult = CheckTag(divElement, tagList);
+     var tagCheckResults = CheckTags(divElement, tagList);
 
-      if (tagCheckResult.result == true) {
-        const spanElement = document.createElement('span');
-        spanElement.style.marginLeft = '0.5em';
-        spanElement.style.border = '1px solid ' + tagCheckResult.user.color;
-        spanElement.style.borderRadius = '0.3em';
-        spanElement.style.padding = '0.1em 0.2em';
-        spanElement.style.background = tagCheckResult.user.bgcolor;
-        spanElement.style.fontSize = '0.8em';
-        spanElement.style.color = tagCheckResult.user.color;
-        spanElement.style.opacity = '0.7';
-        spanElement.innerHTML = tagCheckResult.user.tag;
-
+      if (tagCheckResults.length > 0) {
         const ulElement = divElement.querySelector('ul');
         const liElement = ulElement.querySelector('li');
         const aElement = liElement.querySelector('a');
-        liElement.insertBefore(spanElement, aElement.nextSibling);
+
+        tagCheckResults.forEach(tagCheckResult => {
+          const spanElement = document.createElement('span');
+          spanElement.dataset.nick=tagCheckResult.user.nick;
+          spanElement.dataset.tag =tagCheckResult.user.tag;
+          spanElement.classList.add('badge')
+          spanElement.style.marginLeft = '0.5em';
+          spanElement.style.border = '1px solid ' + tagCheckResult.user.color;
+          spanElement.style.borderRadius = '0.3em';
+          spanElement.style.padding = '0.1em 0.2em';
+          spanElement.style.background = tagCheckResult.user.bgcolor;
+          spanElement.style.fontSize = '0.8em';
+          spanElement.style.color = tagCheckResult.user.color;
+          spanElement.style.opacity = '0.7';
+          spanElement.innerHTML = tagCheckResult.user.tag;
+          spanElement.addEventListener('dblclick', handleBadgeDoubleClick);
+          liElement.insertBefore(spanElement, aElement.nextSibling);
+        });
       }
     }
   });
@@ -136,22 +370,282 @@
     document.head.appendChild(style);
   }
 
-  function CheckTag(divElement, objectArray) {
+
+
+   function CheckTags(divElement, objectArray) {
     const ulElement = divElement.querySelector('ul');
     const liElement = ulElement.querySelector('li');
     const aElement = liElement.querySelector('a');
-    const result = { result: false, user: undefined };
+    const tagCheckResults = [];
 
     for (let i = 0; i < objectArray.length; i++) {
       const user = objectArray[i];
 
       if (aElement.innerHTML.includes(user.nick)) {
-        result.result = true;
-        result.user = user;
-        return result;
+        tagCheckResults.push({ result: true, user: user });
       }
     }
 
-    return result;
+    return tagCheckResults;
+  }
+
+  var options;
+
+  function showOptions( event) {
+    event.stopPropagation();
+    const nickname = event.target.innerText.trim();
+    const x = event.pageX;
+    const y = event.pageY;
+    const optionContainerLast1 = document.querySelectorAll('.option-container');
+    const href = event.target.getAttribute('href');
+    if (optionContainerLast1){
+      optionContainerLast1.forEach(optionContainerLast => {
+    optionContainerLast.remove();
+  });
+
+    }
+    const optionContainer = document.createElement('div');
+    options=optionContainer;
+    optionContainer.classList.add('option-container');
+    optionContainer.style.position = 'absolute';
+    optionContainer.style.top = (event.pageY-5) + 'px';
+    optionContainer.style.left = (event.pageX-5) + 'px';
+    optionContainer.style.width = 130+'px';
+    optionContainer.style.height = 55+'px';
+    optionContainer.style.background = 'white';
+    optionContainer.style.border = '1px solid black';
+    optionContainer.style.padding = '5px';
+    optionContainer.style.borderRadius = '9px';
+
+    const profileOption = document.createElement('div');
+    profileOption.innerText = 'Profile';
+    profileOption.style.cursor = 'pointer';
+    profileOption.style.color = BLACK;
+    profileOption.addEventListener('click', () => {
+      window.location.assign(href);
+      // Handle profile option
+      console.log('Profile clicked');
+    });
+    optionContainer.appendChild(profileOption);
+
+    const blockOption = document.createElement('div');
+    blockOption.innerText = 'Block';
+    blockOption.style.cursor = 'pointer';
+    blockOption.style.color = BLACK;
+    blockOption.addEventListener('click', () => {
+      addToIgnoreListAndStore(nickname);
+
+      console.log('Block clicked');
+      location.reload();
+       optionContainer.remove();
+    });
+    optionContainer.appendChild(blockOption);
+
+    const addTagOption = document.createElement('div');
+    addTagOption.innerText = 'Add Tag';
+    addTagOption.style.cursor = 'pointer';
+    addTagOption.style.color = BLACK;
+    addTagOption.addEventListener('click', () => {
+      // Handle add tag option
+      console.log('Add Tag clicked');
+      showAddTagWindow(nickname,event,href);
+
+       optionContainer.remove();
+    });
+    optionContainer.appendChild(addTagOption);
+
+    document.body.appendChild(optionContainer);
+
+    optionContainer.addEventListener('mouseleave', () => {
+      optionContainer.remove();
+    });
+document.addEventListener('click', (event) => {
+  const optionContainer = document.querySelector('.option-container');
+  if (!optionContainer) return; // Return if the optionContainer is not present
+
+  // Get the bounding box of the optionContainer
+  const rect = optionContainer.getBoundingClientRect();
+
+  // Calculate the distance of the mouse pointer from the optionContainer
+  const distanceX = Math.abs(event.clientX - rect.left) - rect.width / 2;
+  const distanceY = Math.abs(event.clientY - rect.top) - rect.height / 2;
+
+  // Define the desired distance (e.g., 120 pixels)
+  const desiredDistance = 120;
+
+  // Check if the mouse is outside the desired distance from the optionContainer
+  if (distanceX > desiredDistance || distanceY > desiredDistance) {
+    optionContainer.remove();
+  }});
+
+  }
+
+    function showAddTagWindow(nickname, event,href) {
+
+  const tagWindow = document.createElement('div');
+  tagWindow.style.position = 'fixed';
+
+  // Get the bounds of the clicked element
+  const bounds = event.target.getBoundingClientRect();
+  const left = bounds.left;
+  const top = bounds.top;
+
+  tagWindow.style.top = top + 'px';
+  tagWindow.style.left = left + 'px';
+  tagWindow.style.width= '570px';
+  tagWindow.style.height = '25px';
+
+  tagWindow.style.background = 'white';
+  tagWindow.style.border = '1px solid black';
+  tagWindow.style.padding = '10px';
+  tagWindow.style.zIndex = '9999';
+  tagWindow.style.borderRadius = '12px';  // Rounded corners with 12px radius
+  tagWindow.classList.add('div-tagaddwindow');
+  const container = document.createElement('div');
+  container.style.display = 'flex';
+  container.style.flexDirection = 'row';
+  container.style.gap = '10px';
+
+  const nicknameField = document.createElement('div');
+      nicknameField.classList.add("nick-name-container");
+       const linkElement = document.createElement('a');
+    linkElement.href = href; // Set the user profile URL
+    linkElement.textContent = nickname; // Set the text content of the link
+
+    // Append the link element to the div
+    nicknameField.appendChild(linkElement);
+
+      nicknameField.style.color = BLUE;
+      nicknameField.style.fontSize = "20px";
+      nicknameField.style.fontWeight = 'bold';
+  container.appendChild(nicknameField);
+
+  const tagInput = document.createElement('input');
+  tagInput.type = 'text';
+  tagInput.maxLength = 30;
+  tagInput.style.background=WHITE;
+  tagInput.style.color=BLACK;
+  tagInput.placeholder = 'Enter tag';
+      tagInput.style.height='25px';
+  container.appendChild(tagInput);
+
+  const colorContainer1 = createColorPicker('');
+      colorContainer1.dataset.color=BLACK;
+  container.appendChild(colorContainer1);
+ colorContainer1.style.background=BLACK;
+  const colorContainer2 = createColorPicker('');
+  container.appendChild(colorContainer2);
+  colorContainer2.dataset.color=WHITE;
+      colorContainer2.style.background=WHITE;
+
+  const buttonContainer = document.createElement('div');
+  buttonContainer.style.display = 'flex';
+  buttonContainer.style.gap = '10px';
+
+  const cancelButton = document.createElement('button');
+  cancelButton.innerText = 'Cancel';
+  cancelButton.addEventListener('click', () => {
+    tagWindow.remove();
+  });
+  buttonContainer.appendChild(cancelButton);
+
+  const addButton = document.createElement('button');
+  addButton.innerText = 'Add';
+  addButton.addEventListener('click', () => {
+    const tagValue = tagInput.value;
+    const bgColorValue = colorContainer1.dataset.color;
+    const colorValue = colorContainer2.dataset.color;
+    // Handle adding the tag here with the values
+    console.log(`nick: ${nickname}, tag: ${tagValue}, bgcolor: ${bgColorValue}, color: ${colorValue}`);
+    addNewTagToListAndStore(nickname,tagValue,bgColorValue,colorValue);
+    location.reload();
+    tagWindow.remove();
+  });
+  buttonContainer.appendChild(addButton);
+
+  container.appendChild(buttonContainer);
+
+  tagWindow.appendChild(container);
+
+  document.body.appendChild(tagWindow);
+      document.addEventListener('mouse', (event) => {
+  if (!isMouseInsideRectangle(event)) {
+    tagWindow.remove();
+  }
+});
+
+
+function isMouseInsideRectangle(event) {
+  const rect = tagWindow.getBoundingClientRect();
+  const left = rect.left - 100;
+  const right = rect.right + 100;
+  const top = rect.top - 100;
+  const bottom = rect.bottom + 100;
+
+  const mouseX = event.clientX;
+  const mouseY = event.clientY;
+
+  return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom;
+}
+
+var color_picker_element;
+function createColorPicker(label) {
+  const colorPicker = document.createElement('button');
+  colorPicker.classList.add('color-picker');
+
+  colorPicker.style.width = '55px';
+  colorPicker.style.height = '25px';
+  colorPicker.style.borderRadius = '50%'; // Make the color picker round
+  colorPicker.style.cursor = 'pointer'; // Show pointer cursor on hover
+
+  // Function to open the color picker when the element is clicked
+  function openColorPicker(x, y) {
+    if (color_picker_element){ color_picker_element.remove();}
+  const colorPickerWindow = document.createElement('div');
+    color_picker_element=colorPickerWindow;
+  colorPickerWindow.classList.add('color-picker-window');
+  colorPickerWindow.style.position = 'absolute';
+  colorPickerWindow.style.left = (x-(27*3/2)) + 'px';
+  colorPickerWindow.style.top = (y+27) + 'px';
+    colorPickerWindow.style.width=(27*3)+'px';
+    colorPickerWindow.style.height=(27*3)+'px';
+    colorPickerWindow.style.background = 'white';
+  colorPickerWindow.style.border = '1px solid black';
+  colorPickerWindow.style.padding = '10px';
+  colorPickerWindow.style.zIndex = '9999';
+  colorPickerWindow.style.borderRadius = '12px';
+  colorPickerWindow.style.flexDirection = 'column';
+colorPickerWindow.addEventListener('change', () => {
+      colorPickerWindow.remove();
+      colorPicker.focus(); // Return focus to the color picker button
+    });
+  PRESET_COLORS.forEach(color => {
+    const colorOption = document.createElement('button');
+    colorOption.dataset.color=color;
+    colorOption.style.width = '23px';
+  colorOption.style.height = '25px';
+  colorOption.style.borderRadius = '50%';
+    colorOption.classList.add('color-option');
+    colorOption.style.backgroundColor = color;
+    colorOption.addEventListener('click', () => {
+      colorPickerWindow.remove(); // Remove the color picker window after selecting a color
+      // Pass the selected color value back to the script (you can replace the console.log with your desired handling)
+      const selectedColor = color;
+      colorPicker.style.backgroundColor = selectedColor;
+      colorPicker.dataset.color=selectedColor;
+    });
+    colorPickerWindow.appendChild(colorOption);
+  });
+
+  document.body.appendChild(colorPickerWindow);
+}
+
+
+
+  // Add the click event listener to the color picker element
+  colorPicker.addEventListener('click', (event) => openColorPicker(event.pageX, event.pageY));
+
+  return colorPicker;
+}
   }
 })();
